@@ -161,9 +161,7 @@ class Clear_File
     }
 }
 
-$dossier = opendir("decompile");
-
-while (false != ($file = readdir($dossier))) {
+while (false != ($file = readdir(opendir("decompile")))) {
     if ($file == '.' || $file == '..') {
         continue;
     }
@@ -171,5 +169,5 @@ while (false != ($file = readdir($dossier))) {
     $namedir = explode('.', $file)[0];
 
     $clearSwf = new Clear_File($namedir);
-    $clearSwf->Start();
+    $clearSwf->start();
 }

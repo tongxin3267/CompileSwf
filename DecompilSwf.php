@@ -69,7 +69,7 @@ while (false != ($file = readdir(opendir("swf_decompiler")))) {
         echo $e . "\n\r";
     }
 
-    echo "Decompile de " . $file . "\n\r";
+    echo "Decompile " . $file . "\n\r";
 }
 
-echo "Fini";
+echo "Complete";
