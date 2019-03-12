@@ -1,40 +1,37 @@
 <?php
 set_time_limit(0);
 
-class CompileSwf
+class Compile_Swf
 {
-    private $_NameDirCompile;
-    private $_NewNameFurni;
-    private $_Dir;
+    private $_nameDirCompile;
+    private $_newNameFurni;
+    private $_dir;
     private $_categoryName;
 
-    private $_AllCompil;
+    private $_allCompil;
 
     public function __construct($FileName, $all, $CategoryName)
     {
-
-        system("title Compile SWF");
-
-        $this->_NameDirCompile = $FileName;
+        $this->_nameDirCompile = $FileName;
         $this->_categoryName = $CategoryName;
-        $this->_AllCompil = $all;
+        $this->_allCompil = $all;
     }
 
-    public function Start()
+    public function start()
     {
-        $this->PickNewName();
-        $this->InitDir();
-        $this->InitAs3File();
+        $this->_pickNewName();
+        $this->_initDir();
+        $this->_initAs3File();
 
-        exec(__DIR__ . '\framework\flex_sdk_4.6\bin\mxmlc.exe "' . __DIR__ . '\\' . $this->_Dir . '\\' . $this->_NewNameFurni . '.as" -static-link-runtime-shared-libraries=true -compiler.strict -swf-version=9');
-        copy(__DIR__ . '/' . $this->_Dir . '/' . $this->_NewNameFurni . '.swf', __DIR__ . '/swf_compiler/' . $this->_NewNameFurni . '.swf');
-        $this->delTree($this->_Dir);
+        exec(__dir__ . '\framework\flex_sdk_4.6\bin\mxmlc.exe "' . __dir__ . '\\' . $this->_dir . '\\' . $this->_newNameFurni . '.as" -static-link-runtime-shared-libraries=true -compiler.strict -swf-version=9');
+        copy(__dir__ . '/' . $this->_dir . '/' . $this->_newNameFurni . '.swf', __dir__ . '/swf_compiler/' . $this->_newNameFurni . '.swf');
+        $this->_delTree($this->_dir);
     }
 
-    private function PickNewName()
+    private function _pickNewName()
     {
-        if ($this->_AllCompil) {
-            $this->_NewNameFurni = str_replace('-', '_', $this->_NameDirCompile);
+        if ($this->_allCompil) {
+            $this->_newNameFurni = str_replace('-', '_', $this->_nameDirCompile);
         } else {
             echo "\n\r";
             echo "New name swf (or empty for dir name): ";
@@ -42,17 +39,16 @@ class CompileSwf
             $name = rtrim($name, "\n\r");
 
             if (empty($name)) {
-                $this->_NewNameFurni = $this->_NameDirCompile;
+                $this->_newNameFurni = $this->_nameDirCompile;
             } else {
-                $this->_NewNameFurni = $name;
+                $this->_newNameFurni = $name;
             }
-
         }
     }
 
-    private function InitDir()
+    private function _initDir()
     {
-        $compdir = "tmp/" . $this->_NewNameFurni;
+        $compdir = "tmp/" . $this->_newNameFurni;
 
         if (!is_dir($compdir)) {
             mkdir($compdir);
@@ -61,22 +57,22 @@ class CompileSwf
             mkdir($compdir);
         }
 
-        $this->_Dir = $compdir;
+        $this->_dir = $compdir;
     }
 
-    private function InitAs3File()
+    private function _initAs3File()
     {
         $as3 = "";
         $as3source = "";
         $as3base = "";
 
-        $pointeur = opendir("./decompile/" . $this->_categoryName . "/" . $this->_NameDirCompile);
+        $pointeur = opendir("./decompile/" . $this->_categoryName . "/" . $this->_nameDirCompile);
         while (false != ($file = readdir($pointeur))) {
             if ($file == '.' || $file == '..') {
                 continue;
             }
 
-            $newnamefile = str_replace($this->_NameDirCompile, $this->_NewNameFurni, $file);
+            $newnamefile = str_replace($this->_nameDirCompile, $this->_newNameFurni, $file);
             $newname = explode('.', $newnamefile)[0];
             $extent = explode('.', $newnamefile)[1];
             if ($extent != 'dat' && $extent != 'png') {
@@ -115,13 +111,13 @@ class CompileSwf
 			';
             }
 
-            $dataold = file_get_contents("./decompile/" . $this->_categoryName . "/" . $this->_NameDirCompile . "/" . $file);
-            $datanew = str_replace($this->_NameDirCompile, $this->_NewNameFurni, $dataold);
+            $dataold = file_get_contents("./decompile/" . $this->_categoryName . "/" . $this->_nameDirCompile . "/" . $file);
+            $datanew = str_replace($this->_nameDirCompile, $this->_newNameFurni, $dataold);
 
-            file_put_contents($this->_Dir . "/" . $newnamefile, $datanew);
-            file_put_contents($this->_Dir . "/" . $newname . ".as", $as3source);
+            file_put_contents($this->_dir . "/" . $newnamefile, $datanew);
+            file_put_contents($this->_dir . "/" . $newname . ".as", $as3source);
 
-            $as3nameclass = explode($this->_NewNameFurni . "_", $newname, 2)[1];
+            $as3nameclass = explode($this->_newNameFurni . "_", $newname, 2)[1];
 
             $as3 .= "            public static const " . $as3nameclass . ":Class=" . $newname . ";\n\n";
         }
@@ -131,9 +127,9 @@ class CompileSwf
 			{
 				import flash.display.*;
 
-				public class ' . $this->_NewNameFurni . ' extends flash.display.Sprite
+				public class ' . $this->_newNameFurni . ' extends flash.display.Sprite
 				{
-					public function ' . $this->_NewNameFurni . '()
+					public function ' . $this->_newNameFurni . '()
 					{
 						super();
 						return;
@@ -142,11 +138,10 @@ class CompileSwf
 				}
 			}
 			';
-        file_put_contents($this->_Dir . "/" . $this->_NewNameFurni . ".as", $as3base);
-
+        file_put_contents($this->_dir . "/" . $this->_newNameFurni . ".as", $as3base);
     }
 
-    private function delTree($dir)
+    private function _delTree($dir)
     {
         $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
@@ -154,15 +149,13 @@ class CompileSwf
         }
         return rmdir($dir);
     }
-
 }
 
 $_choixcompil = [];
 $_choixcompil[0] = "AllCompil";
 
 $i = 0;
-$pointeur = opendir("decompile");
-while (false != ($file = readdir($pointeur))) {
+while (false != ($file = readdir(opendir("decompile")))) {
     if ($file == '.' || $file == '..') {
         continue;
     }
@@ -192,12 +185,12 @@ if ($_choixcompil[$choix] == "AllCompil") {
             continue;
         }
 
-        $CompileSwf = new CompileSwf($file, true, "");
-        $CompileSwf->Start();
+        $compileSwf = new Compile_Swf($file, true, "");
+        $compileSwf->Start();
     }
 } else {
     $file = $_choixcompil[$choix];
 
-    $CompileSwf = new CompileSwf($file, false, "");
-    $CompileSwf->Start();
+    $compileSwf = new Compile_Swf($file, false, "");
+    $compileSwf->Start();
 }
