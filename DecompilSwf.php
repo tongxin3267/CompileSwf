@@ -56,7 +56,8 @@ class Decompil_Swf
     }
 }
 
-while (false != ($file = readdir(opendir("swf_decompiler")))) {
+$openDir = opendir("swf_decompiler");
+while (false != ($file = readdir($openDir))) {
     if ($file == '.' || $file == '..') {
         continue;
     }

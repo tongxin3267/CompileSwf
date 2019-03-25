@@ -155,7 +155,8 @@ $_choixcompil = [];
 $_choixcompil[0] = "AllCompil";
 
 $i = 0;
-while (false != ($file = readdir(opendir("decompile")))) {
+$openDir = opendir("decompile");
+while (false != ($file = readdir($openDir))) {
     if ($file == '.' || $file == '..') {
         continue;
     }
